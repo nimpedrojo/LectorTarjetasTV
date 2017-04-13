@@ -18,10 +18,10 @@ int tiempoinicial=0;
 int tiempoactual=0;
 
 
-const char* ssid     = "******";
-const char* password = "*********";
+const char* ssid     = "***";
+const char* password = "****";
 const long interval = 30000;
-const char* host = "****.****.****";
+const char* host = "******";
 
 // myRTC(clock, data, rst)
 virtuabotixRTC myRTC(5, 4, 2);
@@ -110,6 +110,7 @@ void loop() {
       if (line.indexOf("id") >= 0 ) {
         Serial.println("Usuario detectado");
         if (line.indexOf("ON") >= 0 ) {
+          digitalWrite(RELAY_PIN, HIGH); 
           horainicio=myRTC.hours;
           minutoinicio=myRTC.minutes;
           tiempoinicial=(horainicio * 60) + minutoinicio;
@@ -119,13 +120,13 @@ void loop() {
           Serial.println("");
           Serial.print("Tiempo inicio");
           Serial.print(tiempoinicial);
-          digitalWrite(RELAY_PIN, HIGH); 
         }
         if (line.indexOf("OFF") >= 0 ) {
+          digitalWrite(RELAY_PIN, LOW); //Relay OFF
           horainicio=0;
           minutoinicio=0;
           tiemporestante=0;
-          digitalWrite(RELAY_PIN, LOW); //Relay OFF
+          tiempoinicial=0;
         }
        } else {
           Serial.println("False");
@@ -138,10 +139,12 @@ void loop() {
 void calcularTiempoPasado(WiFiClient client2){
   if (digitalRead(RELAY_PIN)==HIGH){
     minutoactual=myRTC.minutes ;
+    horaactual=myRTC.hours;
+    tiempoactual=(horaactual * 60) + minutoactual;
     Serial.println("Tiempo actual");
-    Serial.println(minutoactual);
+    Serial.println(tiempoactual);
     
-    if (minutoactual - minutoinicio > tiemporestante){
+    if (tiempoactual - tiempoinicial > tiemporestante){
       digitalWrite(RELAY_PIN, LOW);
       String url2 = "/time";
       client2.println(
@@ -151,3 +154,4 @@ void calcularTiempoPasado(WiFiClient client2){
       }
   }
 }
+
